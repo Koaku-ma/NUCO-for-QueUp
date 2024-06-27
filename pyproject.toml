@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nuco4qu"
+description = "NUCOQU is anUnofficial Comment Observer for QueUp"
+readme = "README.md"
+requires-python = ">=3.7"
+license = { file = "LICENSE" }
+authors = [
+    { name = "NUCO", email = "93378833+sitting-cat@users.noreply.github.com" },
+]
+dynamic = ["version", "dependencies"]
+
+[project.scripts]
+nuco4qu = "nuco4qu.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+dependencies = { file = "requirements.txt" }
