@@ -26,13 +26,21 @@ def main():
         print("MESSAGE is not set")
         exit(1)
 
-    resp = requests.get(ROOM_ENDPOINT + room_name)
+    try:
+        resp = requests.get(ROOM_ENDPOINT + room_name, timeout=5)  # type: ignore
+    except requests.Timeout:
+        print("room timeout")
+        exit(1)
     if resp.status_code != 200:
         print("room not found")
         exit(1)
     room_id = resp.json()["data"]["_id"]
 
-    resp = requests.get(CHAT_ENDPOINT + room_id)
+    try:
+        resp = requests.get(CHAT_ENDPOINT + room_id, timeout=5)
+    except requests.Timeout:
+        print("chat timeout")
+        exit(1)
     if resp.status_code != 200:
         print("chat not found")
         exit(1)
@@ -40,26 +48,36 @@ def main():
     for msgObj in resp.json()["data"]:
         print(msgObj["user"]["username"] + ": " + msgObj["message"])
 
-    resp = requests.post(
-        LOGIN_ENDPOINT,
-        json={
-            "username": username,
-            "password": password,
-        },
-    )
+    try:
+        resp = requests.post(
+            LOGIN_ENDPOINT,
+            json={
+                "username": username,
+                "password": password,
+            },
+            timeout=5,
+        )
+    except requests.Timeout:
+        print("login timeout")
+        exit(1)
     if resp.status_code != 200:
         print("login failed")
         exit(1)
 
-    resp = requests.post(
-        CHAT_ENDPOINT + room_id,
-        json={
-            "message": message,
-        },
-        cookies=resp.cookies,
-    )
+    try:
+        resp = requests.post(
+            CHAT_ENDPOINT + room_id,
+            json={
+                "message": message,
+            },
+            cookies=resp.cookies,
+            timeout=5,
+        )
+    except requests.Timeout:
+        print("post message timeout")
+        exit(1)
     if resp.status_code != 200:
-        print("chat failed")
+        print("post message failed")
         exit(1)
 
     pprint(resp.json())
